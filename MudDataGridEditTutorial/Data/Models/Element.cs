@@ -1,4 +1,6 @@
-﻿namespace MudDataGridEditTutorial.Data.Models
+﻿using System;
+
+namespace MudDataGridEditTutorial.Data.Models
 {
     public class Element
     {
@@ -8,5 +10,7 @@
         public string Name { get; set; } = string.Empty;
         public int Position { get; set; }
         public decimal Molar { get; set; }
+
+        public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
     }
 }

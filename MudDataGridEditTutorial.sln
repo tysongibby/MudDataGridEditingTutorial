@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33801.468
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MudDataGridEditTutorial", "MudDataGridEditTutorial\MudDataGridEditTutorial.csproj", "{B9AE6520-0DAC-483F-A801-096C9C6C55A0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MudDataGridEditTutorial", "MudDataGridEditTutorial\MudDataGridEditTutorial.csproj", "{B9AE6520-0DAC-483F-A801-096C9C6C55A0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{20E8A095-3070-4402-9F1E-665DB32C4478}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

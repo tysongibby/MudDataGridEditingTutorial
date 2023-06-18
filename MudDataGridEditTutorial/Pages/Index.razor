@@ -1,15 +1,23 @@
 ﻿@page "/"
 @using System.Net.Http.Json
 @using MudDataGridEditTutorial.Data.Models
-@*@inject HttpClient httpClient*@
 
 <PageTitle>MudBlazor MudDataGrid Editing Tutorial</PageTitle>
 
 <MudText Typo="Typo.h5" Class="mt-8">Welcome to your new MudBlazor MudDataGrid Editing Tutorial.</MudText>
 
-<MudDataGrid T="Element" Items="@Elements.Take(4)" ReadOnly="@_readOnly" EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
-             StartedEditingItem="@StartedEditingItem" CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges"
-             Bordered="true" Dense="true" EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)">
+<MudDataGrid 
+    T="Element" 
+    Items="@Elements" 
+    ReadOnly="@_readOnly" 
+    EditMode="@(_isCellEditMode ? DataGridEditMode.Cell : DataGridEditMode.Form)"
+    StartedEditingItem="@StartedEditingItem" 
+    CanceledEditingItem="@CanceledEditingItem" 
+    CommittedItemChanges="@CommittedItemChanges"
+    Bordered="true" 
+    Dense="true" 
+    EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)"
+    Class="mt-4">
     <Columns>
         <PropertyColumn Property="x => x.Number" Title="Nr" IsEditable="false" />
         <PropertyColumn Property="x => x.Sign" />
@@ -59,15 +67,90 @@
         }
     </MudExpansionPanel>
 </MudExpansionPanels>
+
+<MudDataGrid T="Element"
+             Items="@Elements"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Form"
+             StartedEditingItem="@StartedEditingItem"
+             CanceledEditingItem="@CanceledEditingItem"
+             CommittedItemChanges="@CommittedItemChanges"
+             Bordered="true"
+             Dense="true"
+             EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)"
+             Class="mt-8">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" IsEditable="false" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.Position" Required RequiredError="You must select a Position!!!" Margin="@Margin.Dense">
+                    <MudSelectItem Value="0">zero</MudSelectItem>
+                    <MudSelectItem Value="1">one</MudSelectItem>
+                    <MudSelectItem Value="17">seventeen</MudSelectItem>
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ModifiedDate" Title="Modified Date">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="UtcDateTime" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+        <TemplateColumn CellClass="d-flex justify-end">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+<MudDataGrid T="Element"
+             Items="@Elements"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Cell"
+             StartedEditingItem="@StartedEditingItem"
+             CanceledEditingItem="@CanceledEditingItem"
+             CommittedItemChanges="@CommittedItemChanges"
+             Bordered="true"
+             Dense="true"
+             EditTrigger="@(_editTriggerRowClick ? DataGridEditTrigger.OnRowClick : DataGridEditTrigger.Manual)"
+             Class="mt-8">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" IsEditable="false" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.Position" Required RequiredError="You must select a Position!!!" Margin="@Margin.Dense">
+                    <MudSelectItem Value="0">zero</MudSelectItem>
+                    <MudSelectItem Value="1">one</MudSelectItem>
+                    <MudSelectItem Value="17">seventeen</MudSelectItem>
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ModifiedDate" Title="Modified Date">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="UtcDateTime" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+    </Columns>
+</MudDataGrid>
+
+
 @code {
     private IEnumerable<Element> Elements = new List<Element>();
     private bool _readOnly;
     private bool _isCellEditMode;
     private List<string> _events = new();
     private bool _editTriggerRowClick;
+    private DateTime? UtcDateTime { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        UtcDateTime = DateTime.UtcNow;        
         Elements = new List<Element>
         {
             new Element
