@@ -12,7 +12,8 @@ namespace MudDataGridEditTutorial.Data
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-        }
-        public virtual DbSet<Element> Elements { get; set; }
+        }        
+        public virtual DbSet<Meeting> Meetings { get; set; }
+        public virtual DbSet<Location> Locations { get; set; }
     }
 }

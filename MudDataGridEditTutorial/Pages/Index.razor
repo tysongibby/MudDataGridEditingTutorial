@@ -1,11 +1,36 @@
 ﻿@page "/"
-@using System.Net.Http.Json
 @using MudDataGridEditTutorial.Data.Models
+@using MudDataGridEditTutorial.Data;
+@using Microsoft.EntityFrameworkCore;
+@inject ApplicationDbContext DbContext
 
-<PageTitle>MudBlazor MudDataGrid Editing Tutorial</PageTitle>
 
-<MudText Typo="Typo.h5" Class="mt-8">Welcome to your new MudBlazor MudDataGrid Editing Tutorial.</MudText>
+<PageTitle>MudBlazor MudDataGrid Editing</PageTitle>
 
+<MudText Typo="Typo.h5" Class="mt-8">MudBlazor MudDataGrid Editing</MudText>
+
+<!-- ****MEETINGS EXAMPLE **** -->
+<MudText Typo="Typo.h6" Class="mt-8">Meetings Example</MudText>
+<MudDataGrid T="Meeting"
+    Items="@Meetings"
+    ReadOnly="false"
+    EditMode="DataGridEditMode.Form"
+    Class="mb-8">
+    <Columns>
+        <PropertyColumn Property="m => m.Name" />
+        <PropertyColumn Property="m => m.Description" />
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+
+
+</MudDataGrid>
+
+
+@*Example from Mudblazor https://mudblazor.com/components/datagrid#editing*@
 <MudDataGrid 
     T="Element" 
     Items="@Elements" 
@@ -68,6 +93,7 @@
     </MudExpansionPanel>
 </MudExpansionPanels>
 
+@*With DateTime Field*@
 <MudDataGrid T="Element"
              Items="@Elements"
              ReadOnly="false"
@@ -106,6 +132,7 @@
     </Columns>
 </MudDataGrid>
 
+@*In-line editing*@
 <MudDataGrid T="Element"
              Items="@Elements"
              ReadOnly="false"
@@ -139,8 +166,48 @@
     </Columns>
 </MudDataGrid>
 
+@*With DateTime Field - without Editing options*@
+<MudDataGrid T="Element"
+             Items="@Elements"
+             ReadOnly="false"
+             EditMode="DataGridEditMode.Form"
+             StartedEditingItem="@StartedEditingItem"
+             CanceledEditingItem="@CanceledEditingItem"
+             CommittedItemChanges="@CommittedItemChanges"
+             Bordered="true"
+             Dense="true"
+             EditTrigger="@DataGridEditTrigger.Manual"
+             Class="mt-8">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" IsEditable="false" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Position">
+            <EditTemplate>
+                <MudSelect @bind-Value="context.Item.Position" Required RequiredError="You must select a Position!!!" Margin="@Margin.Dense">
+                    <MudSelectItem Value="0">zero</MudSelectItem>
+                    <MudSelectItem Value="1">one</MudSelectItem>
+                    <MudSelectItem Value="17">seventeen</MudSelectItem>
+                </MudSelect>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.ModifiedDate" Title="Modified Date">
+            <EditTemplate>
+                <MudDatePicker @bind-Date="UtcDateTime" />
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+        <TemplateColumn CellClass="d-flex justify-end" Title="Edit">
+            <CellTemplate>
+                <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
 
-@code {
+@code 
+{
+    private List<Meeting> Meetings { get; set; }
     private IEnumerable<Element> Elements = new List<Element>();
     private bool _readOnly;
     private bool _isCellEditMode;
@@ -150,46 +217,48 @@
 
     protected override void OnInitialized()
     {
-        UtcDateTime = DateTime.UtcNow;        
+        //Meetings = DbContext.Meetings.ToList();
+        Meetings = DbContext.Meetings.Include(m => m.Location).ToList();        
+        UtcDateTime = DateTime.UtcNow;
         Elements = new List<Element>
-        {
-            new Element
             {
-                Id = 1,
-                Number = 1,
-                Sign = "H",
-                Name = "Hydrogen",
-                Position = 0,
-                Molar = 1.00794M
-            },
-            new Element
-            {
-                Id = 2,
-                Number = 2,
-                Sign = "He",
-                Name = "Helium",
-                Position = 17,
-                Molar = 4.002602M
-            },
-            new Element
-            {
-                Id = 3,
-                Number = 3,
-                Sign = "Li",
-                Name = "Lithium",
-                Position = 0,
-                Molar = 6.941M
-            },
-            new Element
-            {
-                Id = 4,
-                Number = 4,
-                Sign = "Be",
-                Name = "Beryllium",
-                Position = 1,
-                Molar = 9.012182M
-            }
-        };
+                new Element
+                {
+                    Id = 1,
+                    Number = 1,
+                    Sign = "H",
+                    Name = "Hydrogen",
+                    Position = 0,
+                    Molar = 1.00794M
+                },
+                new Element
+                {
+                    Id = 2,
+                    Number = 2,
+                    Sign = "He",
+                    Name = "Helium",
+                    Position = 17,
+                    Molar = 4.002602M
+                },
+                new Element
+                {
+                    Id = 3,
+                    Number = 3,
+                    Sign = "Li",
+                    Name = "Lithium",
+                    Position = 0,
+                    Molar = 6.941M
+                },
+                new Element
+                {
+                    Id = 4,
+                    Number = 4,
+                    Sign = "Be",
+                    Name = "Beryllium",
+                    Position = 1,
+                    Molar = 9.012182M
+                }
+            };
     }
 
     // events
@@ -207,4 +276,7 @@
     {
         _events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}");
     }
+
+
+
 }

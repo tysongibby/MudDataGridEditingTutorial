@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
 using MudDataGridEditTutorial.Areas.Identity;
 using MudDataGridEditTutorial.Data;
+using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +25,15 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 builder.Services.AddMudServices();
 
 var app = builder.Build();
+
+// If database is empty, seed database
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+dbContext.Database.EnsureCreated();
+if (!dbContext.Meetings.Any())
+{
+    ApplicationDbSeeder.Seed(dbContext);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
